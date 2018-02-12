@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = 'eng.karim.mousa.89@gmail.com'
 
   spec.summary       = 'upload dsyms to fastlane'
-  # spec.homepage      = "https://github.com/<GITHUB_USERNAME>/fastlane-plugin-instabug_official"
+  spec.homepage      = "https://github.com/Karim-Mohamed-Mousa/fastlane-plugin-instabug-official"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
