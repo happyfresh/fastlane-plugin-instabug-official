@@ -14,16 +14,12 @@ module Fastlane
         curlCommand = ''
         single_path = params[:dsym_path]
 
-        if !single_path.nil?
-          curlCommand += build_single_file_command(command, single_path)
-        else
-          dsym_paths = params[:dsym_array_paths].uniq
+        dsym_paths = ((params[:dsym_array_paths] || []) + (params[:dsym_path] || [])).uniq
 
-          directory_name = generate_directory_name
-          copy_dsym_paths_into_directory(dsym_paths, directory_name)
-          build_single_file_command(command, dsym_paths)
-          remove_directory(directory_name)
-        end
+        directory_name = generate_directory_name
+        copy_dsym_paths_into_directory(dsym_paths, directory_name)
+        build_single_file_command(command, dsym_paths)
+        remove_directory(directory_name)
 
         UI.verbose curlCommand
         return curlCommand if Helper.test?
