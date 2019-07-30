@@ -12,13 +12,18 @@ module Fastlane
         command = "curl #{endpoint} --write-out %{http_code} --silent --output /dev/null -F os=\"ios\" -F application_token=\"#{api_token}\" -F symbols_file="
 
         curlCommand = ''
-        single_path = params[:dsym_path]
 
         dsym_paths = ((params[:dsym_array_paths] || []) + (params[:dsym_path] || [])).uniq
+        UI.verbose dsym_paths.inspect
 
         directory_name = generate_directory_name
+        UI.verbose directory_name
+
         copy_dsym_paths_into_directory(dsym_paths, directory_name)
+
         build_single_file_command(command, dsym_paths)
+
+        UI.verbose 'Removing The directory'
         remove_directory(directory_name)
 
         UI.verbose curlCommand
@@ -93,7 +98,7 @@ module Fastlane
         remove_directory(directory_name)
         FileUtils.mkdir_p directory_path
         dsym_paths.each do |path|
-          File.copy(path, "#{directory_path}/#{path}")
+          File.copy(path, "#{directory_path}/#{File.basename(path)}") if File.exist?(path)
         end
       end
 
