@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'fastlane/action'
 require_relative '../helper/instabug_official_helper'
 
@@ -17,10 +18,11 @@ module Fastlane
           curlCommand += build_single_file_command(command, single_path)
         else
           dsym_paths = params[:dsym_array_paths].uniq
-          dsym_paths.each do |file_path|
-            curlCommand += build_single_file_command(command, file_path)
-            curlCommand += ' | ' if file_path != dsym_paths.last
-          end
+
+          directory_name = generate_directory_name
+          copy_dsym_paths_into_directory(dsym_paths, directory_name)
+          build_single_file_command(command, dsym_paths)
+          remove_directory(directory_name)
         end
 
         UI.verbose curlCommand
@@ -82,6 +84,22 @@ module Fastlane
       end
 
       private
+
+      def self.generate_directory_name
+        "Instabug_dsym_files_fastlane_#{Time.now.to_i}"
+      end
+
+      def self.remove_directory(directory_path)
+        FileUtils.rm_rf directory_path
+      end
+
+      def self.copy_dsym_paths_into_directory(dsym_paths, directory_path)
+        remove_directory(directory_name)
+        FileUtils.mkdir_p directory_path
+        dsym_paths.each do |path|
+          File.copy(path, "#{directory_path}/#{path}")
+        end
+      end
 
       def self.build_single_file_command(command, dsym_path)
         file_path = if dsym_path.end_with?('.zip')
