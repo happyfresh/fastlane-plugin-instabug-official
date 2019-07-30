@@ -6,6 +6,7 @@ module Fastlane
   module Actions
     class InstabugOfficialAction < Action
       def self.run(params)
+        UI.verbose "Running Instabug Action"
         api_token = params[:api_token]
 
         endpoint = 'https://api.instabug.com/api/sdk/v3/symbols_files'
@@ -14,14 +15,14 @@ module Fastlane
         curlCommand = ''
 
         dsym_paths = ((params[:dsym_array_paths] || []) + (params[:dsym_path] || [])).uniq
-        UI.verbose dsym_paths.inspect
+        UI.verbose "dsym_paths: " + dsym_paths.inspect
 
         directory_name = generate_directory_name
-        UI.verbose directory_name
+        UI.verbose "Directory name: " + directory_name
 
         copy_dsym_paths_into_directory(dsym_paths, directory_name)
 
-        build_single_file_command(command, dsym_paths)
+        build_single_file_command(command, directory_name)
 
         UI.verbose 'Removing The directory'
         remove_directory(directory_name)
