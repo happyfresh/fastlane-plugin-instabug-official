@@ -12,8 +12,6 @@ module Fastlane
             endpoint = 'https://api.instabug.com/api/sdk/v3/symbols_files'
             command = "curl #{endpoint} --write-out %{http_code} --silent --output /dev/null -F os=\"ios\" -F application_token=\"#{api_token}\" -F symbols_file="
             
-            curlCommand = ''
-            
             dsym_paths = (params[:dsym_array_paths] || []).uniq
             
             UI.verbose "dsym_paths: " + dsym_paths.inspect
@@ -27,9 +25,6 @@ module Fastlane
             
             UI.verbose 'Removing The directory'
             remove_directory(directory_name)
-            
-            UI.verbose curlCommand
-            return curlCommand if Helper.test?
             
             puts command
             
