@@ -77,7 +77,7 @@ end
 private
 
 def self.generate_directory_name
-"Instabug_dsym_files_fastlane_#{Time.now.to_i}"
+"Instabug_dsym_files_fastlane"
 end
 
 def self.remove_directory(directory_path)
@@ -85,6 +85,7 @@ FileUtils.rm_rf directory_path
 end
 
 def self.copy_dsym_paths_into_directory(dsym_paths, directory_path)
+FileUtils.rm "Instabug_dsym_files_fastlane.zip", :force => true
 FileUtils.mkdir_p directory_path
 dsym_paths.each do |path|
     FileUtils.copy_entry(path, "#{directory_path}/#{File.basename(path)}") if File.exist?(path)
