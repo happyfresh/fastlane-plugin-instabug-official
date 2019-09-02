@@ -13,24 +13,27 @@ module Fastlane
             command = "curl #{endpoint} --write-out %{http_code} --silent --output /dev/null -F os=\"ios\" -F application_token=\"#{api_token}\" -F symbols_file="
             
             dsym_paths = (params[:dsym_array_paths] || []).uniq
-            
             UI.verbose "dsym_paths: " + dsym_paths.inspect
             
-            directory_name = generate_directory_name
-            UI.verbose "Directory name: " + directory_name
             
-            copy_dsym_paths_into_directory(dsym_paths, directory_name)
-            
+            if dsym_paths.empty?
+                directory_name = fastlane_dsyms_filename
+                UI.success 'dSYM is successfully uploaded to Instabug 🤖'
+            else
+                directory_name = generate_directory_name
+                UI.verbose "Directory name: " + directory_name
+                copy_dsym_paths_into_directory(dsym_paths, directory_name)
+            end
+        
             command = build_single_file_command(command, directory_name)
-            
             UI.verbose 'Removing The directory'
-            remove_directory(directory_name)
             
             puts command
             
             result = Actions.sh(command)
             if result == '200'
             UI.success 'dSYM is successfully uploaded to Instabug 🤖'
+            remove_directory(directory_name)
             else
             UI.error "Something went wrong during Instabug dSYM upload. Status code is #{result}"
         end
@@ -64,8 +67,7 @@ FastlaneCore::ConfigItem.new(key: :api_token,
 FastlaneCore::ConfigItem.new(key: :dsym_array_paths,
                              type: Array,
                              optional: true,
-                             description: 'Array of paths to *.dSYM.zip files',
-                             default_value: Actions.lane_context[SharedValues::DSYM_PATHS])
+                             description: 'Array of paths to *.dSYM files')
 ]
 end
 
@@ -99,6 +101,18 @@ else
 ZipAction.run(path: dsym_path).shellescape
 end
 command + "@\"#{file_path}\""
+end
+
+# this is a fallback scenario incase of dSYM paths are not provided.
+# We use the dSYMs  folder from iTC
+def self.fastlane_dsyms_filename
+paths = Dir["./**/*.dSYM.zip"]
+iTunesConnectdSYMs = paths[0] if !paths.empty?
+iTunesConnectdSYMs ["./"] = ""
+renamediTunesConnectdSYMs = iTunesConnectdSYMs.clone
+renamediTunesConnectdSYMs [".dSYM"] = "-iTC"
+File.rename(iTunesConnectdSYMs, renamediTunesConnectdSYMs)
+default_value = renamediTunesConnectdSYMs
 end
 
 end
