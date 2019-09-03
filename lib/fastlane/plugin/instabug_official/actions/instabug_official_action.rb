@@ -19,7 +19,7 @@ module Fastlane
             if dsym_paths.empty?
                 directory_name = fastlane_dsyms_filename
                 if directory_name.empty?
-                UI.error "Fastlane dSYMs file is not found! make sure your're using fastlane action [download_dsyms] to download your dSYMs from iTC"
+                UI.error "Fastlane dSYMs file is not found! make sure you're using Fastlane action [download_dsyms] to download your dSYMs from App Store Connect"
                 return
                 end
             else
