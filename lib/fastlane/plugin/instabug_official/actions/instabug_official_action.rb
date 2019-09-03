@@ -18,7 +18,10 @@ module Fastlane
             
             if dsym_paths.empty?
                 directory_name = fastlane_dsyms_filename
-                UI.success 'dSYM is successfully uploaded to Instabug 🤖'
+                if directory_name.empty?
+                UI.error "Fastlane dSYMs file is not found! make sure your're using fastlane action [download_dsyms] to download your dSYMs from iTC"
+                return
+                end
             else
                 directory_name = generate_directory_name
                 UI.verbose "Directory name: " + directory_name
@@ -26,13 +29,13 @@ module Fastlane
             end
         
             command = build_single_file_command(command, directory_name)
-            UI.verbose 'Removing The directory'
             
             puts command
             
             result = Actions.sh(command)
             if result == '200'
             UI.success 'dSYM is successfully uploaded to Instabug 🤖'
+            UI.verbose 'Removing The directory'
             remove_directory(directory_name)
             else
             UI.error "Something went wrong during Instabug dSYM upload. Status code is #{result}"
@@ -107,7 +110,11 @@ end
 # We use the dSYMs  folder from iTC
 def self.fastlane_dsyms_filename
 paths = Dir["./**/*.dSYM.zip"]
-iTunesConnectdSYMs = paths[0] if !paths.empty?
+if paths.empty?
+return ""
+end
+
+iTunesConnectdSYMs = paths[0]
 iTunesConnectdSYMs ["./"] = ""
 renamediTunesConnectdSYMs = iTunesConnectdSYMs.clone
 renamediTunesConnectdSYMs [".dSYM"] = "-iTC"
