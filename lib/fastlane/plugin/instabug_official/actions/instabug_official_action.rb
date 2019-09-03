@@ -47,7 +47,7 @@ module Fastlane
 end
 
 def self.authors
-['Karim_Mousa_89']
+['Instabug Inc.']
 end
 
 def self.return_value
