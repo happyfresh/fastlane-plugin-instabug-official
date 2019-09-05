@@ -7,11 +7,11 @@ require 'fastlane/plugin/instabug_official/version'
 Gem::Specification.new do |spec|
   spec.name          = 'fastlane-plugin-instabug_official'
   spec.version       = Fastlane::InstabugOfficial::VERSION
-  spec.author        = 'Karim_Mousa_89'
-  spec.email         = 'eng.karim.mousa.89@gmail.com'
+  spec.author        = 'Instabug'
+  spec.email         = 'iosteam@instabug.com'
 
-  spec.summary       = 'upload dsyms to fastlane'
-  spec.homepage      = "https://github.com/Karim-Mohamed-Mousa/fastlane-plugin-instabug-official"
+  spec.summary       = 'Plugin to upload DSYMs to Instabug Dashboard.'
+  spec.homepage      = "https://github.com/Instabug/fastlane-plugin-instabug-official"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
