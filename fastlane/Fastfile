@@ -15,10 +15,11 @@ platform :ios do
   desc "Build demo app"
   lane :build do
     gym(project: "FastlanePluginDemo/FastlanePluginDemo.xcodeproj", scheme: "FastlanePluginDemo", export_method: "development")
+    instabug_official(api_token: "<Instabug token>")
   end
 
   lane :refresh_dsyms do
     download_dsyms(version: "latest")
-    instabug_official(api_token: "asdsad")
+    instabug_official(api_token: "<Instabug token>")
   end
 end
