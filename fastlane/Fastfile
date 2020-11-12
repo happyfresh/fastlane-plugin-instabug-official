@@ -16,4 +16,9 @@ platform :ios do
   lane :build do
     gym(project: "FastlanePluginDemo/FastlanePluginDemo.xcodeproj", scheme: "FastlanePluginDemo", export_method: "development")
   end
+
+  lane :refresh_dsyms do
+    download_dsyms(version: "latest")
+    instabug_official(api_token: "asdsad")
+  end
 end

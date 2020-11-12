@@ -19,6 +19,8 @@ module Fastlane
         dsym_paths += (params[:dsym_array_paths] || [])
         # Add dSYMs generaed by `gym`
         dsym_paths += [Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]] if Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]
+        # Add dSYMs downloaded from iTC
+        dsym_paths += Actions.lane_context[SharedValues::DSYM_PATHS] if Actions.lane_context[SharedValues::DSYM_PATHS]
 
         dsym_paths.uniq!
         UI.verbose 'dsym_paths: ' + dsym_paths.inspect
