@@ -6,39 +6,45 @@ module Fastlane
   module Actions
     class InstabugOfficialAction < Action
       def self.run(params)
+        @instabug_dsyms_directory = 'Instabug_dsym_files_fastlane'
+
         UI.verbose 'Running Instabug Action'
         api_token = params[:api_token]
 
         endpoint = 'https://api.instabug.com/api/sdk/v3/symbols_files'
         command = "curl #{endpoint} --write-out %{http_code} --silent --output /dev/null -F os=\"ios\" -F application_token=\"#{api_token}\" -F symbols_file="
 
-        dsym_paths = (params[:dsym_array_paths] || []).uniq
+        dsym_paths = []
+        # Add paths provided by the user
+        dsym_paths += (params[:dsym_array_paths] || [])
+        # Add dSYMs generaed by `gym`
+        dsym_paths += [Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]] if Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]
+
+        dsym_paths.uniq!
         UI.verbose 'dsym_paths: ' + dsym_paths.inspect
 
         if dsym_paths.empty?
-          directory_name = fastlane_dsyms_filename
-          if directory_name.empty?
-            UI.error "Fastlane dSYMs file is not found! make sure you're using Fastlane action [download_dsyms] to download your dSYMs from App Store Connect"
-            return
-          end
-        else
-          directory_name = generate_directory_name
-          UI.verbose 'Directory name: ' + directory_name
-          copy_dsym_paths_into_directory(dsym_paths, directory_name)
+          UI.error "Fastlane dSYMs file is not found! make sure you're using Fastlane action [download_dsyms] to download your dSYMs from App Store Connect"
+          return
         end
 
-        command = build_single_file_command(command, directory_name)
+        generate_instabug_directory
 
-        puts command
+        UI.verbose 'Directory name: ' + @instabug_dsyms_directory
+        copy_dsym_paths_into_directory(dsym_paths, @instabug_dsyms_directory)
+
+        command = build_single_file_command(command, @instabug_dsyms_directory)
 
         result = Actions.sh(command)
         if result == '200'
           UI.success 'dSYM is successfully uploaded to Instabug 🤖'
           UI.verbose 'Removing The directory'
-          remove_directory(directory_name)
         else
           UI.error "Something went wrong during Instabug dSYM upload. Status code is #{result}"
         end
+
+        # Cleanup zip file and directory
+        cleanup_instabug_directory
       end
 
       def self.description
@@ -80,8 +86,14 @@ module Fastlane
         true
       end
 
-      def self.generate_directory_name
-        'Instabug_dsym_files_fastlane'
+      def self.generate_instabug_directory
+        cleanup_instabug_directory
+        FileUtils.mkdir_p @instabug_dsyms_directory
+      end
+
+      def self.cleanup_instabug_directory
+        FileUtils.rm_f "#{@instabug_dsyms_directory}.zip"
+        FileUtils.rm_rf @instabug_dsyms_directory
       end
 
       def self.remove_directory(directory_path)
@@ -89,10 +101,12 @@ module Fastlane
       end
 
       def self.copy_dsym_paths_into_directory(dsym_paths, directory_path)
-        FileUtils.rm 'Instabug_dsym_files_fastlane.zip', force: true
-        FileUtils.mkdir_p directory_path
         dsym_paths.each do |path|
-          FileUtils.copy_entry(path, "#{directory_path}/#{File.basename(path)}") if File.exist?(path)
+          if File.extname(path) == '.dSYM'
+            FileUtils.copy_entry(path, "#{directory_path}/#{File.basename(path)}") if File.exist?(path)
+          else
+            Actions.sh("unzip #{path} -d #{directory_path}")
+          end
         end
       end
 
@@ -103,20 +117,6 @@ module Fastlane
                       ZipAction.run(path: dsym_path).shellescape
                     end
         command + "@\"#{file_path}\""
-      end
-
-      # this is a fallback scenario incase of dSYM paths are not provided.
-      # We use the dSYMs  folder from iTC
-      def self.fastlane_dsyms_filename
-        paths = Dir['./**/*.dSYM.zip']
-        return '' if paths.empty?
-
-        iTunesConnectdSYMs = paths[0]
-        iTunesConnectdSYMs ['./'] = ''
-        renamediTunesConnectdSYMs = iTunesConnectdSYMs.clone
-        renamediTunesConnectdSYMs ['.dSYM'] = '-iTC'
-        File.rename(iTunesConnectdSYMs, renamediTunesConnectdSYMs)
-        default_value = renamediTunesConnectdSYMs
       end
     end
   end
