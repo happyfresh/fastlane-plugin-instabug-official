@@ -50,9 +50,13 @@ module Fastlane
       end
 
       def self.description
-        'This action is used to upload symbolication files to Instabug. Incase you are not using bitcode, you can use this plug-in
+        "Upload dSYM files to Instabug"
+      end
+    
+      def self.details
+        "This action is used to upload symbolication files to Instabug. Incase you are not using bitcode, you can use this plug-in
         with `gym` to upload dSYMs generated from your builds. If bitcode is enabled, you can use it with `download_dsyms` to upload dSYMs
-        from iTunes connect'
+        from iTunes connect"
       end
 
       def self.authors
@@ -61,6 +65,13 @@ module Fastlane
 
       def self.return_value
         # If your method provides a return value, you can describe here what it does
+      end
+
+      def self.example_code
+        [
+          'instabug_official(api_token: "<Instabug token>")',
+          'instabug_official(api_token: "<Instabug token>", dsym_array_paths: ["./App1.dSYM.zip", "./App2.dSYM.zip"])'
+        ]
       end
 
       def self.available_options

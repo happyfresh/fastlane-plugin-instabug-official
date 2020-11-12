@@ -12,15 +12,21 @@ fastlane add_plugin instabug_official
 
 ## About instabug_official
 
+Upload dSYM files to Instabug
+
 This action is used to upload symbolication files to Instabug. Incase you are not using bitcode, you can use this plug-in
 with `gym` to upload dSYMs generated from your builds. If bitcode is enabled, you can use it with `download_dsyms` to upload dSYMs
 from iTunes connect
 
 ## Example
 
-Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin. Try it by cloning the repo, running `fastlane install_plugins` and `bundle exec fastlane test`.
+```
+instabug_official(api_token: "<Instabug token>")
+```
 
-**Note to author:** Please set up a sample project to make it easy for users to explore what your plugin does. Provide everything that is necessary to try out the plugin in this project (including a sample Xcode/Android project if necessary)
+```
+instabug_official(api_token: "<Instabug token>", dsym_array_paths: ["./App1.dSYM.zip", "./App2.dSYM.zip"])
+```
 
 ## Issues and Feedback
 
