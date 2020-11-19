@@ -93,3 +93,5 @@ iOSInjectionProject/
 
 fastlane/report.xml
 fastlane/README.md
+
+pkg/
