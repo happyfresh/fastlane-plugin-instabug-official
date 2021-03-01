@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'fastlane/action'
 require_relative '../helper/instabug_official_helper'
+require 'shellwords'
 
 module Fastlane
   module Actions
@@ -116,7 +117,7 @@ module Fastlane
             destination_path = "#{directory_path}/#{File.basename(path)}"
             FileUtils.copy_entry(path, destination_path) if File.exist?(path)
           else
-            Actions.sh("unzip -n #{path} -d #{directory_path}")
+            Actions.sh("unzip -n #{Shellwords.shellescape(path)} -d #{Shellwords.shellescape(directory_path)}")
           end
         end
       end
@@ -127,7 +128,7 @@ module Fastlane
                     else
                       ZipAction.run(path: dsym_path).shellescape
                     end
-        command + "@\"#{file_path}\""
+        command + "@\"#{Shellwords.shellescape(file_path)}\""
       end
     end
   end
