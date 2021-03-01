@@ -114,9 +114,10 @@ module Fastlane
       def self.copy_dsym_paths_into_directory(dsym_paths, directory_path)
         dsym_paths.each do |path|
           if File.extname(path) == '.dSYM'
-            FileUtils.copy_entry(path, "#{directory_path}/#{File.basename(path)}") if File.exist?(path)
+            destination_path = "#{directory_path}/#{File.basename(path)}"
+            FileUtils.copy_entry(path, destination_path) if File.exist?(path)
           else
-            Actions.sh("unzip #{Shellwords.shellescape(path)} -d #{Shellwords.shellescape(directory_path)}")
+            Actions.sh("unzip -n #{Shellwords.shellescape(path)} -d #{Shellwords.shellescape(directory_path)}")
           end
         end
       end
