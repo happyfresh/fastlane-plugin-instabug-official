@@ -128,7 +128,7 @@ module Fastlane
                     else
                       ZipAction.run(path: dsym_path).shellescape
                     end
-        command + "@\"#{Shellwords.shellescape(file_path)}\""
+        command + "@#{file_path}"
       end
     end
   end
